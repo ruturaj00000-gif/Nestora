@@ -1,98 +1,271 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+
+import React, { useEffect, useState } from 'react';
+
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
+
+import { Text, Button } from 'react-native-paper';
+import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../constants/nestora-theme';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+export default function WelcomeScreen() {
+  const [showSplash, setShowSplash] = useState(true);
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // FULL SCREEN SPLASH SCREEN
+  if (showSplash) {
     return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
+      <View style={styles.splashContainer}>
+        <Image
+          source={require('../../assets/images/nestora-splash.png')}
+          style={styles.splashImage}
+          resizeMode="cover"
+        />
+
+        <ActivityIndicator
+          size="small"
+          color={COLORS.primary}
+          style={styles.loader}
+        />
+      </View>
     );
   }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+
+  // WELCOME SCREEN
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <View style={styles.logo}>
+            <Text style={styles.logoLetter}>N</Text>
+          </View>
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+          <Text style={styles.brand}>NESTORA</Text>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+          <Text style={styles.tagline}>
+            FIND YOUR STAY. FEEL AT HOME.
+          </Text>
+        </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        {/* Hero Section */}
+        <View style={styles.hero}>
+          <View style={styles.heroImage}>
+            <Text style={styles.houseIcon}>⌂</Text>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+            <Text style={styles.imageCaption}>
+              YOUR NEXT ESCAPE
+            </Text>
+          </View>
+        </View>
+
+        {/* Welcome Content */}
+        <View style={styles.content}>
+          <Text style={styles.heading}>
+            Discover places{'\n'}you'll love to stay.
+          </Text>
+
+          <Text style={styles.description}>
+            Explore beautiful homes, comfortable apartments
+            and unique stays for your next journey.
+          </Text>
+
+          {/* Register Button */}
+          <Link href="/register" asChild>
+            <Button
+              mode="contained"
+              style={styles.button}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+            >
+              Get Started
+            </Button>
+          </Link>
+
+          {/* Login Button */}
+          <Link href="/login" asChild>
+            <Button
+              mode="outlined"
+              style={styles.loginButton}
+              contentStyle={styles.buttonContent}
+              textColor={COLORS.primary}
+            >
+              I already have an account
+            </Button>
+          </Link>
+
+          <Text style={styles.footer}>
+            YOUR JOURNEY BEGINS WITH NESTORA
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+
+  // SPLASH SCREEN STYLES
+
+  splashContainer: {
     flex: 1,
+    width: '100%',
+    height: '100%',
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
+
+  splashImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+
+  loader: {
+    position: 'absolute',
+    bottom: 45,
+  },
+
+  // WELCOME SCREEN STYLES
+
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    backgroundColor: COLORS.background,
   },
-  heroSection: {
+
+  container: {
+    flexGrow: 1,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+    paddingBottom: 25,
+  },
+
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 28,
+  },
+
+  logo: {
+    width: 58,
+    height: 58,
+    backgroundColor: COLORS.primary,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
   },
-  title: {
+
+  logoLetter: {
+    fontSize: 34,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+
+  brand: {
+    fontSize: 23,
+    fontWeight: 'bold',
+    letterSpacing: 5,
+    color: COLORS.primary,
+    marginTop: 12,
+  },
+
+  tagline: {
+    fontSize: 9,
+    letterSpacing: 2,
+    color: COLORS.muted,
+    marginTop: 5,
+  },
+
+  hero: {
+    height: 270,
+    borderRadius: 25,
+    overflow: 'hidden',
+    marginBottom: 28,
+  },
+
+  heroImage: {
+    flex: 1,
+    backgroundColor: '#D9E2D6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  houseIcon: {
+    fontSize: 120,
+    color: COLORS.primary,
+  },
+
+  imageCaption: {
+    color: COLORS.primary,
+    fontWeight: 'bold',
+    letterSpacing: 3,
+    fontSize: 11,
+  },
+
+  content: {
+    alignItems: 'center',
+  },
+
+  heading: {
+    fontSize: 32,
+    lineHeight: 40,
+    fontWeight: 'bold',
+    color: COLORS.text,
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
+
+  description: {
+    color: COLORS.muted,
+    fontSize: 14,
+    lineHeight: 23,
+    textAlign: 'center',
+    marginTop: 13,
+    marginBottom: 25,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+
+  button: {
+    width: '100%',
+    borderRadius: 14,
   },
+
+  buttonContent: {
+    height: 53,
+  },
+
+  buttonLabel: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+
+  loginButton: {
+    width: '100%',
+    marginTop: 12,
+    borderRadius: 14,
+    borderColor: COLORS.primary,
+  },
+
+  footer: {
+    color: COLORS.muted,
+    fontSize: 9,
+    letterSpacing: 2,
+    marginTop: 27,
+  },
+
 });
